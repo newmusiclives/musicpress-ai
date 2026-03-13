@@ -21,6 +21,7 @@ import {
   AlertCircle,
   X,
   Trash2,
+  ShieldCheck,
   ChevronLeft,
   ChevronRight,
   Database,
@@ -95,6 +96,21 @@ export default function ContactsPage() {
     contactsImported: number;
     errors: string[];
   } | null>(null);
+
+  // Cleanup state
+  const [showCleanup, setShowCleanup] = useState(false);
+  const [scanning, setScanning] = useState(false);
+  const [cleaning, setCleaning] = useState(false);
+  const [scanResult, setScanResult] = useState<{
+    total: number;
+    junkCount: number;
+    suspiciousCount: number;
+    cleanCount: number;
+    junk: Array<{ id: string; name: string; email: string; outlet: string; type: string; reason: string }>;
+    suspicious: Array<{ id: string; name: string; email: string; outlet: string; type: string; reason: string }>;
+  } | null>(null);
+  const [cleanupTab, setCleanupTab] = useState<"junk" | "suspicious">("junk");
+  const [cleanupDone, setCleanupDone] = useState<{ deleted: number } | null>(null);
 
   // Debounce search
   useEffect(() => {
@@ -277,6 +293,45 @@ export default function ContactsPage() {
     }
   }
 
+  async function handleScan() {
+    setScanning(true);
+    setScanResult(null);
+    setCleanupDone(null);
+    try {
+      const res = await fetch("/api/contacts/cleanup");
+      if (res.ok) {
+        setScanResult(await res.json());
+      }
+    } catch (err) {
+      console.error("Scan failed:", err);
+    } finally {
+      setScanning(false);
+    }
+  }
+
+  async function handlePurge(ids: string[]) {
+    if (ids.length === 0) return;
+    if (!confirm(`Permanently delete ${ids.length} contact(s)? This cannot be undone.`)) return;
+    setCleaning(true);
+    try {
+      const res = await fetch("/api/contacts/cleanup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ids }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setCleanupDone(data);
+        setScanResult(null);
+        fetchContacts();
+      }
+    } catch (err) {
+      console.error("Purge failed:", err);
+    } finally {
+      setCleaning(false);
+    }
+  }
+
   const pageNumbers = [];
   for (let i = Math.max(1, page - 2); i <= Math.min(totalPages, page + 2); i++) {
     pageNumbers.push(i);
@@ -301,6 +356,13 @@ export default function ContactsPage() {
               Delete ({selectedIds.size})
             </button>
           )}
+          <button
+            onClick={() => { setShowCleanup(true); setScanResult(null); setCleanupDone(null); }}
+            className="flex items-center gap-2 text-sm font-medium text-foreground/70 border border-border px-4 py-2.5 rounded-xl hover:bg-surface transition-colors"
+          >
+            <ShieldCheck className="w-4 h-4" />
+            Review &amp; Clean
+          </button>
           <button
             onClick={exportCSV}
             className="flex items-center gap-2 text-sm font-medium text-foreground/70 border border-border px-4 py-2.5 rounded-xl hover:bg-surface transition-colors"
@@ -356,6 +418,184 @@ export default function ContactsPage() {
               >
                 {creatingList ? "Creating..." : "Create"}
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Review & Clean Modal */}
+      {showCleanup && (
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
+          <div className="bg-surface border border-border rounded-2xl w-full max-w-2xl max-h-[80vh] flex flex-col">
+            <div className="flex items-center justify-between p-6 border-b border-border">
+              <div className="flex items-center gap-3">
+                <ShieldCheck className="w-5 h-5 text-accent" />
+                <h3 className="font-bold text-lg">Review &amp; Clean Contacts</h3>
+              </div>
+              <button onClick={() => setShowCleanup(false)} className="p-1 rounded-lg hover:bg-surface-light">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-6 overflow-y-auto flex-1">
+              {!scanResult && !cleanupDone && (
+                <div className="text-center py-8">
+                  <ShieldCheck className="w-12 h-12 mx-auto mb-4 text-foreground/20" />
+                  <p className="text-sm text-foreground/50 mb-6">
+                    Scan your contacts database to find junk entries (sentry IDs, tracking emails, invalid addresses) and suspicious contacts for review.
+                  </p>
+                  <button
+                    onClick={handleScan}
+                    disabled={scanning}
+                    className="px-6 py-3 text-sm font-bold text-white bg-gradient-to-r from-accent to-primary rounded-xl hover:opacity-90 disabled:opacity-50"
+                  >
+                    {scanning ? (
+                      <span className="flex items-center gap-2"><Loader2 className="w-4 h-4 animate-spin" /> Scanning...</span>
+                    ) : (
+                      "Scan Contacts"
+                    )}
+                  </button>
+                </div>
+              )}
+
+              {scanResult && (
+                <>
+                  {/* Summary stats */}
+                  <div className="grid grid-cols-3 gap-3 mb-6">
+                    <div className="bg-success/10 border border-success/20 rounded-xl p-4 text-center">
+                      <div className="text-2xl font-extrabold text-success">{scanResult.cleanCount}</div>
+                      <div className="text-xs text-foreground/40">Clean</div>
+                    </div>
+                    <div className="bg-danger/10 border border-danger/20 rounded-xl p-4 text-center">
+                      <div className="text-2xl font-extrabold text-danger">{scanResult.junkCount}</div>
+                      <div className="text-xs text-foreground/40">Junk</div>
+                    </div>
+                    <div className="bg-warning/10 border border-warning/20 rounded-xl p-4 text-center">
+                      <div className="text-2xl font-extrabold text-yellow-500">{scanResult.suspiciousCount}</div>
+                      <div className="text-xs text-foreground/40">Suspicious</div>
+                    </div>
+                  </div>
+
+                  {scanResult.junkCount === 0 && scanResult.suspiciousCount === 0 ? (
+                    <div className="text-center py-6">
+                      <CheckCircle2 className="w-10 h-10 mx-auto mb-3 text-success" />
+                      <p className="text-sm font-medium text-success">Your contacts database is clean!</p>
+                      <p className="text-xs text-foreground/40 mt-1">No junk or suspicious entries found.</p>
+                    </div>
+                  ) : (
+                    <>
+                      {/* Tab toggle */}
+                      <div className="flex gap-2 mb-4">
+                        <button
+                          onClick={() => setCleanupTab("junk")}
+                          className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                            cleanupTab === "junk"
+                              ? "bg-danger/10 text-danger border border-danger/30"
+                              : "text-foreground/50 border border-border hover:bg-surface-light"
+                          }`}
+                        >
+                          Junk ({scanResult.junkCount})
+                        </button>
+                        <button
+                          onClick={() => setCleanupTab("suspicious")}
+                          className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                            cleanupTab === "suspicious"
+                              ? "bg-yellow-500/10 text-yellow-500 border border-yellow-500/30"
+                              : "text-foreground/50 border border-border hover:bg-surface-light"
+                          }`}
+                        >
+                          Suspicious ({scanResult.suspiciousCount})
+                        </button>
+                      </div>
+
+                      {/* Contact list */}
+                      <div className="border border-border rounded-xl overflow-hidden max-h-[300px] overflow-y-auto">
+                        <table className="w-full text-sm">
+                          <thead className="bg-surface-light sticky top-0">
+                            <tr className="text-xs text-foreground/40">
+                              <th className="px-3 py-2 text-left">Email</th>
+                              <th className="px-3 py-2 text-left">Outlet</th>
+                              <th className="px-3 py-2 text-left">Reason</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {(cleanupTab === "junk" ? scanResult.junk : scanResult.suspicious).map((c) => (
+                              <tr key={c.id} className="border-t border-border/50 hover:bg-surface-light/30">
+                                <td className="px-3 py-2 font-mono text-xs truncate max-w-[200px]" title={c.email}>{c.email}</td>
+                                <td className="px-3 py-2 text-foreground/60 truncate max-w-[150px]">{c.outlet}</td>
+                                <td className="px-3 py-2">
+                                  <span className={`text-xs px-2 py-0.5 rounded-full ${
+                                    cleanupTab === "junk" ? "bg-danger/10 text-danger" : "bg-yellow-500/10 text-yellow-500"
+                                  }`}>
+                                    {c.reason}
+                                  </span>
+                                </td>
+                              </tr>
+                            ))}
+                            {(cleanupTab === "junk" ? scanResult.junk : scanResult.suspicious).length === 0 && (
+                              <tr><td colSpan={3} className="px-3 py-6 text-center text-foreground/30">None found</td></tr>
+                            )}
+                          </tbody>
+                        </table>
+                      </div>
+
+                      {/* Action buttons */}
+                      <div className="flex justify-between items-center mt-4">
+                        <button
+                          onClick={handleScan}
+                          disabled={scanning}
+                          className="px-4 py-2 text-sm text-foreground/60 border border-border rounded-lg hover:bg-surface-light"
+                        >
+                          Re-scan
+                        </button>
+                        <div className="flex gap-2">
+                          {scanResult.junkCount > 0 && (
+                            <button
+                              onClick={() => handlePurge(scanResult.junk.map((c) => c.id))}
+                              disabled={cleaning}
+                              className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-white bg-danger rounded-lg hover:opacity-90 disabled:opacity-50"
+                            >
+                              {cleaning ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                              Purge All Junk ({scanResult.junkCount})
+                            </button>
+                          )}
+                          {scanResult.suspiciousCount > 0 && cleanupTab === "suspicious" && (
+                            <button
+                              onClick={() => handlePurge(scanResult.suspicious.map((c) => c.id))}
+                              disabled={cleaning}
+                              className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-white bg-yellow-600 rounded-lg hover:opacity-90 disabled:opacity-50"
+                            >
+                              {cleaning ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                              Purge Suspicious ({scanResult.suspiciousCount})
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </>
+              )}
+
+              {cleanupDone && (
+                <div className="text-center py-8">
+                  <CheckCircle2 className="w-12 h-12 mx-auto mb-3 text-success" />
+                  <p className="text-lg font-bold text-success">{cleanupDone.deleted} contacts removed</p>
+                  <p className="text-sm text-foreground/40 mt-1">Your database is cleaner now.</p>
+                  <div className="flex justify-center gap-3 mt-6">
+                    <button
+                      onClick={() => { setCleanupDone(null); handleScan(); }}
+                      className="px-4 py-2 text-sm text-foreground/60 border border-border rounded-lg hover:bg-surface-light"
+                    >
+                      Scan Again
+                    </button>
+                    <button
+                      onClick={() => setShowCleanup(false)}
+                      className="px-4 py-2 text-sm font-bold text-white bg-gradient-to-r from-accent to-success rounded-lg hover:opacity-90"
+                    >
+                      Done
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
