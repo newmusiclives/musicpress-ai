@@ -17,6 +17,7 @@ import {
   Loader2,
   AlertCircle,
   X,
+  Trash2,
   ChevronLeft,
   ChevronRight,
   Database,
@@ -214,6 +215,36 @@ export default function ContactsPage() {
     }
   }
 
+  async function handleDelete(contactId: string, contactName: string) {
+    if (!confirm(`Delete contact "${contactName}"? This cannot be undone.`)) return;
+    try {
+      const res = await fetch(`/api/contacts/${contactId}`, { method: "DELETE" });
+      if (res.ok) {
+        setContacts((prev) => prev.filter((c) => c.id !== contactId));
+        setTotal((prev) => prev - 1);
+      }
+    } catch (err) {
+      console.error("Failed to delete contact:", err);
+    }
+  }
+
+  async function handleDeleteSelected() {
+    if (selectedIds.size === 0) return;
+    if (!confirm(`Delete ${selectedIds.size} selected contact(s)? This cannot be undone.`)) return;
+    try {
+      await Promise.all(
+        Array.from(selectedIds).map((id) =>
+          fetch(`/api/contacts/${id}`, { method: "DELETE" })
+        )
+      );
+      setContacts((prev) => prev.filter((c) => !selectedIds.has(c.id)));
+      setTotal((prev) => prev - selectedIds.size);
+      setSelectedIds(new Set());
+    } catch (err) {
+      console.error("Failed to delete contacts:", err);
+    }
+  }
+
   async function handleImport() {
     setImporting(true);
     setImportResult(null);
@@ -258,6 +289,15 @@ export default function ContactsPage() {
           </p>
         </div>
         <div className="flex items-center gap-3">
+          {selectedIds.size > 0 && (
+            <button
+              onClick={handleDeleteSelected}
+              className="flex items-center gap-2 text-sm font-medium text-danger border border-danger/30 px-4 py-2.5 rounded-xl hover:bg-danger/10 transition-colors"
+            >
+              <Trash2 className="w-4 h-4" />
+              Delete ({selectedIds.size})
+            </button>
+          )}
           <button
             onClick={exportCSV}
             className="flex items-center gap-2 text-sm font-medium text-foreground/70 border border-border px-4 py-2.5 rounded-xl hover:bg-surface transition-colors"
@@ -610,6 +650,13 @@ export default function ContactsPage() {
                             className="p-1.5 rounded-lg hover:bg-surface-light transition-colors"
                           >
                             <Star className={`w-4 h-4 ${savedIds.has(contact.id) ? "text-truefans-amber fill-truefans-amber" : "text-foreground/40"}`} />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(contact.id, contact.name)}
+                            className="p-1.5 rounded-lg hover:bg-danger/10 transition-colors"
+                            title="Delete contact"
+                          >
+                            <Trash2 className="w-4 h-4 text-foreground/40 hover:text-danger" />
                           </button>
                         </div>
                       </td>

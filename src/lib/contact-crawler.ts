@@ -66,6 +66,11 @@ function extractEmails(html: string): string[] {
     if (IGNORED_EMAIL_PREFIXES.some((p) => lower.startsWith(p))) return false;
     // Filter out image/file extensions masquerading as emails
     if (/\.(png|jpg|jpeg|gif|svg|css|js|webp|ico)$/i.test(lower)) return false;
+    // Filter out junk emails where local part matches or contains domain (e.g. domain.com@domain.com)
+    const [localPart, domain] = lower.split("@");
+    if (domain && localPart.includes(domain.split(".")[0])) return false;
+    // Filter out very short local parts (likely junk)
+    if (localPart.length < 3) return false;
     return true;
   });
 }
