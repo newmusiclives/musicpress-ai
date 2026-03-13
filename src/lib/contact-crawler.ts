@@ -35,6 +35,7 @@ interface BlogEntry {
   description?: string;
   genre?: string;
   region?: string;
+  _contactType?: "blog" | "journalist" | "curator" | "podcaster";
 }
 
 // ─── Email extraction ─────────────────────────────────────────────────────────
@@ -394,6 +395,221 @@ async function crawlBlogListArticles(): Promise<BlogEntry[]> {
   return deduplicateBlogs(blogs);
 }
 
+// ─── 4. Music Journalists — Publication staff/contributor pages ───────────────
+
+async function crawlJournalists(): Promise<BlogEntry[]> {
+  const sources = [
+    // Feedspot journalist directories
+    "https://bloggers.feedspot.com/music_journalists/",
+    "https://bloggers.feedspot.com/music_critics/",
+    // Major publication staff/about pages
+    "https://pitchfork.com/about/",
+    "https://pitchfork.com/staff/",
+    "https://consequenceofsound.net/about/",
+    "https://www.stereogum.com/about/",
+    "https://www.nme.com/about-us",
+    "https://www.thelineofbestfit.com/about",
+    "https://www.clashmusic.com/contact/",
+    "https://www.diymagazine.com/contact-us/",
+    "https://www.billboard.com/about-us/",
+    "https://www.rollingstone.com/contact/",
+    "https://www.spin.com/about/",
+    "https://www.pastemagazine.com/about",
+    "https://www.brooklynvegan.com/about/",
+    "https://www.undertheradarmag.com/contact",
+    "https://exclaim.ca/contact",
+    "https://www.themusic.com.au/contact",
+    "https://www.musicradar.com/about-us",
+    "https://www.popmatters.com/about",
+    // Music journalist curated lists
+    "https://muckrack.com/media-outlet/pitchfork",
+    "https://blog.feedspot.com/music_journalism_blogs/",
+  ];
+
+  const blogs: BlogEntry[] = [];
+
+  for (const url of sources) {
+    const html = await politelyFetch(url);
+    if (!html) continue;
+
+    const $ = cheerio.load(html);
+    let hostname = "";
+    try { hostname = new URL(url).hostname.replace(/^www\./, ""); } catch { hostname = url; }
+
+    // For Feedspot directories, use the same parsing as blogs
+    if (url.includes("feedspot.com")) {
+      $(".tbl_blog_row, .feed-item, [class*='blog-item'], .rss-block").each((_, el) => {
+        const $el = $(el);
+        const name = $el.find("h2, h3, .tbl_blog_name, .feed-name, a[target='_blank']").first().text().trim();
+        const link = $el.find("a[target='_blank']").first().attr("href") || "";
+        const desc = $el.find(".tbl_blog_about, .feed-description, p").first().text().trim();
+        if (name && link && !link.includes("feedspot.com")) {
+          blogs.push({
+            name: name.replace(/^\d+\.\s*/, ""),
+            url: link,
+            description: desc,
+            genre: classifyGenre(name + " " + desc),
+            region: classifyRegion(name + " " + desc),
+          });
+        }
+      });
+      $("a[target='_blank']").each((_, el) => {
+        const $a = $(el);
+        const href = $a.attr("href") || "";
+        const text = $a.text().trim();
+        if (text.length > 3 && href.startsWith("http") && !href.includes("feedspot.com") && !href.includes("facebook.com") && !href.includes("twitter.com") && !blogs.some((b) => b.url === href)) {
+          blogs.push({ name: text, url: href, genre: "All Genres", region: "Global" });
+        }
+      });
+    } else {
+      // For publication pages, treat the whole site as a journalist contact source
+      blogs.push({
+        name: hostname,
+        url: url.replace(/\/about\/?$|\/staff\/?$|\/contact\/?$|\/about-us\/?$/i, ""),
+        description: $('meta[name="description"]').attr("content") || "",
+        genre: "All Genres",
+        region: classifyRegion(hostname),
+      });
+    }
+  }
+
+  return deduplicateBlogs(blogs);
+}
+
+// ─── 5. Playlist Curators — Spotify curator directories ──────────────────────
+
+async function crawlCurators(): Promise<BlogEntry[]> {
+  const sources = [
+    "https://bloggers.feedspot.com/spotify_playlist_curators/",
+    "https://bloggers.feedspot.com/apple_music_playlist_curators/",
+    "https://blog.feedspot.com/spotify_playlists/",
+    // Curator submission and directory sites
+    "https://www.playlistpush.com/blog/spotify-playlist-curators",
+    "https://www.dailyplaylists.com/blog/spotify-playlist-curators",
+    "https://indiemono.com/playlist-curators/",
+    "https://www.soundplate.com/contact/",
+    "https://www.mysphera.co/curators",
+    "https://www.tunemymusic.com/blog/spotify-playlist-curators",
+  ];
+
+  const blogs: BlogEntry[] = [];
+
+  for (const url of sources) {
+    const html = await politelyFetch(url);
+    if (!html) continue;
+
+    const $ = cheerio.load(html);
+
+    if (url.includes("feedspot.com")) {
+      $(".tbl_blog_row, .feed-item, [class*='blog-item'], .rss-block").each((_, el) => {
+        const $el = $(el);
+        const name = $el.find("h2, h3, .tbl_blog_name, .feed-name, a[target='_blank']").first().text().trim();
+        const link = $el.find("a[target='_blank']").first().attr("href") || "";
+        const desc = $el.find(".tbl_blog_about, .feed-description, p").first().text().trim();
+        if (name && link && !link.includes("feedspot.com")) {
+          blogs.push({ name: name.replace(/^\d+\.\s*/, ""), url: link, description: desc, genre: classifyGenre(desc), region: classifyRegion(desc) });
+        }
+      });
+      $("a[target='_blank']").each((_, el) => {
+        const $a = $(el);
+        const href = $a.attr("href") || "";
+        const text = $a.text().trim();
+        if (text.length > 3 && href.startsWith("http") && !href.includes("feedspot.com") && !href.includes("facebook.com") && !href.includes("twitter.com") && !blogs.some((b) => b.url === href)) {
+          blogs.push({ name: text, url: href, genre: "All Genres", region: "Global" });
+        }
+      });
+    } else {
+      // Parse article-style lists for curator sites
+      $("h2, h3, h4").each((_, el) => {
+        const $h = $(el);
+        const heading = $h.text().trim();
+        const $link = $h.find("a").first();
+        let href = $link.attr("href") || "";
+        if (!href) {
+          const $next = $h.next("p, div");
+          href = $next.find("a[href^='http']").first().attr("href") || "";
+        }
+        if (heading && href && !href.includes(new URL(url).hostname)) {
+          blogs.push({
+            name: heading.replace(/^\d+[\.\)\-\s]+/, "").replace(/\s*[\–\-\|].*$/, "").trim(),
+            url: href,
+            description: $h.next("p").text().trim().slice(0, 300),
+            genre: classifyGenre(heading),
+            region: classifyRegion(heading),
+          });
+        }
+      });
+      // Also add the page itself as a source
+      blogs.push({
+        name: new URL(url).hostname.replace(/^www\./, ""),
+        url: url,
+        genre: "All Genres",
+        region: "Global",
+      });
+    }
+  }
+
+  return deduplicateBlogs(blogs);
+}
+
+// ─── 6. Music Podcasters — Podcast directories ──────────────────────────────
+
+async function crawlPodcasters(): Promise<BlogEntry[]> {
+  const sources = [
+    "https://bloggers.feedspot.com/music_podcasts/",
+    "https://bloggers.feedspot.com/indie_music_podcasts/",
+    "https://bloggers.feedspot.com/hip_hop_podcasts/",
+    "https://bloggers.feedspot.com/rock_music_podcasts/",
+    "https://bloggers.feedspot.com/music_industry_podcasts/",
+    "https://bloggers.feedspot.com/music_production_podcasts/",
+    // Podcast network contact pages
+    "https://www.iheart.com/contact/",
+    "https://gimletmedia.com/about",
+    // Music podcast curated lists
+    "https://blog.feedspot.com/music_interview_podcasts/",
+    "https://www.musicbusinessworldwide.com/contact/",
+  ];
+
+  const blogs: BlogEntry[] = [];
+
+  for (const url of sources) {
+    const html = await politelyFetch(url);
+    if (!html) continue;
+
+    const $ = cheerio.load(html);
+
+    if (url.includes("feedspot.com")) {
+      $(".tbl_blog_row, .feed-item, [class*='blog-item'], .rss-block").each((_, el) => {
+        const $el = $(el);
+        const name = $el.find("h2, h3, .tbl_blog_name, .feed-name, a[target='_blank']").first().text().trim();
+        const link = $el.find("a[target='_blank']").first().attr("href") || "";
+        const desc = $el.find(".tbl_blog_about, .feed-description, p").first().text().trim();
+        if (name && link && !link.includes("feedspot.com")) {
+          blogs.push({ name: name.replace(/^\d+\.\s*/, ""), url: link, description: desc, genre: classifyGenre(desc), region: classifyRegion(desc) });
+        }
+      });
+      $("a[target='_blank']").each((_, el) => {
+        const $a = $(el);
+        const href = $a.attr("href") || "";
+        const text = $a.text().trim();
+        if (text.length > 3 && href.startsWith("http") && !href.includes("feedspot.com") && !href.includes("facebook.com") && !href.includes("twitter.com") && !blogs.some((b) => b.url === href)) {
+          blogs.push({ name: text, url: href, genre: "All Genres", region: "Global" });
+        }
+      });
+    } else {
+      blogs.push({
+        name: new URL(url).hostname.replace(/^www\./, ""),
+        url: url,
+        description: $('meta[name="description"]').attr("content") || "",
+        genre: "All Genres",
+        region: classifyRegion($("body").text().slice(0, 1000)),
+      });
+    }
+  }
+
+  return deduplicateBlogs(blogs);
+}
+
 // ─── Deduplication ────────────────────────────────────────────────────────────
 
 function deduplicateBlogs(blogs: BlogEntry[]): BlogEntry[] {
@@ -417,7 +633,7 @@ function deduplicateBlogs(blogs: BlogEntry[]): BlogEntry[] {
 // MAIN PIPELINE
 // ═══════════════════════════════════════════════════════════════════════════════
 
-export type CrawlSource = "feedspot" | "hypemachine" | "articles" | "all";
+export type CrawlSource = "feedspot" | "hypemachine" | "articles" | "journalists" | "curators" | "podcasters" | "all";
 
 export async function runCrawlPipeline(
   source: CrawlSource = "all",
@@ -459,6 +675,27 @@ export async function runCrawlPipeline(
       log(`Found ${articleBlogs.length} blogs from article lists`);
       allBlogs.push(...articleBlogs);
     }
+
+    if (source === "journalists" || source === "all") {
+      log("Crawling journalist directories...");
+      const journalistEntries = await crawlJournalists();
+      log(`Found ${journalistEntries.length} journalist sources`);
+      allBlogs.push(...journalistEntries.map(e => ({ ...e, _contactType: "journalist" as const })));
+    }
+
+    if (source === "curators" || source === "all") {
+      log("Crawling playlist curator directories...");
+      const curatorEntries = await crawlCurators();
+      log(`Found ${curatorEntries.length} curator sources`);
+      allBlogs.push(...curatorEntries.map(e => ({ ...e, _contactType: "curator" as const })));
+    }
+
+    if (source === "podcasters" || source === "all") {
+      log("Crawling music podcast directories...");
+      const podcasterEntries = await crawlPodcasters();
+      log(`Found ${podcasterEntries.length} podcaster sources`);
+      allBlogs.push(...podcasterEntries.map(e => ({ ...e, _contactType: "podcaster" as const })));
+    }
   } catch (err) {
     result.errors.push(`Directory crawl error: ${err}`);
   }
@@ -490,6 +727,13 @@ export async function runCrawlPipeline(
         const emailLower = email.toLowerCase();
         if (existingEmails.has(emailLower)) continue;
 
+        const contactType = blog._contactType || (source === "journalists" ? "journalist" : source === "curators" ? "curator" : source === "podcasters" ? "podcaster" : "blog");
+        const beatMap: Record<string, string> = {
+          blog: "Music Submissions",
+          journalist: "Music Journalism",
+          curator: "Playlist Curation",
+          podcaster: "Music Podcast",
+        };
         const contact: DiscoveredContact = {
           name: blog.name,
           email,
@@ -497,9 +741,9 @@ export async function runCrawlPipeline(
           url: blog.url,
           genre: blog.genre || classifyGenre(bio + " " + (blog.description || "")),
           region: blog.region || classifyRegion(bio + " " + (blog.description || "")),
-          type: "blog",
-          beat: "Music Submissions",
-          bio: (blog.description || bio || `Music blog discovered from ${source}`).slice(0, 500),
+          type: contactType,
+          beat: beatMap[contactType] || "Music Submissions",
+          bio: (blog.description || bio || `${contactType} discovered from ${source}`).slice(0, 500),
           source,
         };
 

@@ -13,6 +13,9 @@ import {
   Headphones,
   Globe,
   Mic2,
+  Users,
+  ListMusic,
+  Podcast,
   Target,
   Loader2,
   AlertCircle,
@@ -375,18 +378,21 @@ export default function ContactsPage() {
             {!importResult ? (
               <>
                 <p className="text-sm text-foreground/50 mb-4">
-                  Crawl music blog directories to discover contacts. The crawler visits blog contact pages and extracts publicly available emails.
+                  Crawl directories to discover music journalists, playlist curators, podcasters, and blogs. The crawler visits contact pages and extracts publicly available emails.
                 </p>
 
                 {/* Source selector */}
                 <div className="mb-4">
                   <label className="text-xs text-foreground/50 mb-2 block">Crawl Source</label>
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="grid grid-cols-3 gap-2">
                     {[
-                      { id: "all", label: "All Sources", desc: "Feedspot + Hype Machine + Articles", icon: Zap },
+                      { id: "all", label: "All Sources", desc: "Blogs + Journalists + Curators + Podcasters", icon: Zap },
                       { id: "feedspot", label: "Feedspot", desc: "Music blog directories", icon: Globe },
                       { id: "hypemachine", label: "Hype Machine", desc: "Indexed music blogs", icon: Headphones },
                       { id: "articles", label: "Blog Lists", desc: "Curated article lists", icon: Newspaper },
+                      { id: "journalists", label: "Journalists", desc: "Music journalists & critics", icon: Users },
+                      { id: "curators", label: "Curators", desc: "Spotify & playlist curators", icon: ListMusic },
+                      { id: "podcasters", label: "Podcasters", desc: "Music podcast hosts", icon: Podcast },
                     ].map((s) => (
                       <button
                         key={s.id}
