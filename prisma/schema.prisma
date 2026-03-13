@@ -1,0 +1,305 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── AUTH ────────────────────────────────────────────────────────────────────
+
+model User {
+  id             String    @id @default(uuid())
+  email          String    @unique
+  name           String?
+  passwordHash   String
+  role           String    @default("artist") // artist | venue | label | admin
+  avatarUrl      String?
+  bio            String?
+  genre          String?
+  location       String?
+  website        String?
+  spotifyUrl     String?
+  instagramUrl   String?
+  twitterUrl     String?
+  truefansId     String?
+  truefansConnected Boolean @default(false)
+  plan           String    @default("free") // free | artist_pro | venue_label
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  campaigns       Campaign[]
+  pressReleases   PressRelease[]
+  contactLists    ContactList[]
+  savedContacts   SavedContact[]
+  pitchResponses  PitchResponse[]
+  mediaMentions   MediaMention[]
+  venues          Venue[]
+  epks            EPK[]
+}
+
+// ─── CONTACTS DATABASE ──────────────────────────────────────────────────────
+
+model Contact {
+  id          String   @id @default(uuid())
+  name        String
+  email       String
+  outlet      String
+  type        String   // journalist | curator | blog | podcaster
+  genre       String?
+  region      String?
+  beat        String?
+  phone       String?
+  twitter     String?
+  instagram   String?
+  linkedin    String?
+  website     String?
+  bio         String?
+  avatarUrl   String?
+  verified    Boolean  @default(true)
+  lastActive  DateTime?
+  articleCount Int     @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  savedBy         SavedContact[]
+  contactListItems ContactListItem[]
+  campaignRecipients CampaignRecipient[]
+
+  @@index([type])
+  @@index([genre])
+  @@index([region])
+  @@index([verified])
+}
+
+model SavedContact {
+  id        String   @id @default(uuid())
+  userId    String
+  contactId String
+  notes     String?
+  createdAt DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  contact Contact @relation(fields: [contactId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, contactId])
+  @@index([userId])
+}
+
+model ContactList {
+  id        String   @id @default(uuid())
+  userId    String
+  name      String
+  description String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user  User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items ContactListItem[]
+
+  @@index([userId])
+}
+
+model ContactListItem {
+  id            String   @id @default(uuid())
+  contactListId String
+  contactId     String
+  createdAt     DateTime @default(now())
+
+  contactList ContactList @relation(fields: [contactListId], references: [id], onDelete: Cascade)
+  contact     Contact     @relation(fields: [contactId], references: [id], onDelete: Cascade)
+
+  @@unique([contactListId, contactId])
+}
+
+// ─── CAMPAIGNS ──────────────────────────────────────────────────────────────
+
+model Campaign {
+  id            String   @id @default(uuid())
+  userId        String
+  name          String
+  type          String
+  status        String   @default("draft")
+  subject       String?
+  body          String?
+  scheduledAt   DateTime?
+  sentAt        DateTime?
+  completedAt   DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  ghlCampaignId  String?
+  ghlWorkflowId  String?
+
+  user       User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  recipients CampaignRecipient[]
+
+  @@index([userId])
+  @@index([status])
+}
+
+model CampaignRecipient {
+  id          String    @id @default(uuid())
+  campaignId  String
+  contactId   String
+  status      String    @default("pending")
+  sentAt      DateTime?
+  openedAt    DateTime?
+  clickedAt   DateTime?
+  repliedAt   DateTime?
+
+  campaign Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  contact  Contact  @relation(fields: [contactId], references: [id], onDelete: Cascade)
+
+  @@unique([campaignId, contactId])
+  @@index([status])
+}
+
+// ─── PRESS RELEASES ─────────────────────────────────────────────────────────
+
+model PressRelease {
+  id            String   @id @default(uuid())
+  userId        String
+  title         String
+  subtitle      String?
+  body          String
+  type          String
+  status        String   @default("draft")
+  language      String   @default("en")
+  tone          String   @default("professional")
+  distributedAt DateTime?
+  scheduledAt   DateTime?
+  outletsReached Int     @default(0)
+  totalViews    Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+}
+
+// ─── PITCH REQUESTS ─────────────────────────────────────────────────────────
+
+model PitchRequest {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  outlet      String
+  journalist  String
+  category    String
+  deadline    String?
+  genres      String?
+  regions     String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  responses PitchResponse[]
+
+  @@index([isActive])
+  @@index([category])
+}
+
+model PitchResponse {
+  id             String   @id @default(uuid())
+  pitchRequestId String
+  userId         String
+  message        String
+  status         String   @default("sent")
+  createdAt      DateTime @default(now())
+
+  pitchRequest PitchRequest @relation(fields: [pitchRequestId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([pitchRequestId])
+}
+
+// ─── MEDIA MONITOR ──────────────────────────────────────────────────────────
+
+model MediaMention {
+  id        String   @id @default(uuid())
+  userId    String
+  title     String
+  outlet    String
+  author    String?
+  url       String?
+  type      String
+  sentiment String   @default("neutral")
+  reach     String?
+  date      DateTime @default(now())
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+// ─── VENUES ─────────────────────────────────────────────────────────────────
+
+model Venue {
+  id          String  @id @default(uuid())
+  userId      String
+  name        String
+  location    String
+  address     String?
+  capacity    Int?
+  description String?
+  website     String?
+  phone       String?
+  photoUrl    String?
+  rating      Float   @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user  User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  shows Show[]
+
+  @@index([userId])
+}
+
+model Show {
+  id          String   @id @default(uuid())
+  venueId     String
+  artist      String
+  date        DateTime
+  time        String?
+  ticketUrl   String?
+  ticketsSold Int      @default(0)
+  capacity    Int      @default(0)
+  pressStatus String   @default("not_started")
+  coverage    Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  venue Venue @relation(fields: [venueId], references: [id], onDelete: Cascade)
+
+  @@index([venueId])
+}
+
+// ─── EPK (Electronic Press Kit) ─────────────────────────────────────────────
+
+model EPK {
+  id           String  @id @default(uuid())
+  userId       String
+  artistName   String
+  bio          String?
+  genre        String?
+  location     String?
+  photoUrls    String?
+  musicLinks   String?
+  socialLinks  String?
+  tourDates    String?
+  pressQuotes  String?
+  isPublished  Boolean @default(false)
+  slug         String  @unique
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
