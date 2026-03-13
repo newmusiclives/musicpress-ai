@@ -463,10 +463,14 @@ export async function runCrawlPipeline(
   result.blogsDiscovered = allBlogs.length;
   log(`Total unique blogs discovered: ${allBlogs.length}`);
 
-  // ── Stage 2: Crawl each blog for contact emails ───────────────────────────
+  // ── Stage 2: Crawl each blog and import contacts immediately ────────────
 
-  log("Stage 2: Extracting contact emails from blog sites...");
-  const discovered: DiscoveredContact[] = [];
+  log("Stage 2: Extracting contacts and importing into database...");
+
+  // Get existing emails to avoid duplicates
+  const existingEmails = new Set(
+    (await prisma.contact.findMany({ select: { email: true } })).map((c) => c.email.toLowerCase())
+  );
 
   for (let i = 0; i < allBlogs.length; i++) {
     const blog = allBlogs[i];
@@ -478,7 +482,10 @@ export async function runCrawlPipeline(
       const { emails, bio } = await findContactEmails(blog.url);
 
       for (const email of emails) {
-        discovered.push({
+        const emailLower = email.toLowerCase();
+        if (existingEmails.has(emailLower)) continue;
+
+        const contact: DiscoveredContact = {
           name: blog.name,
           email,
           outlet: blog.name,
@@ -489,57 +496,41 @@ export async function runCrawlPipeline(
           beat: "Music Submissions",
           bio: (blog.description || bio || `Music blog discovered from ${source}`).slice(0, 500),
           source,
-        });
-        result.emailsExtracted++;
+        };
+
+        try {
+          await prisma.contact.create({
+            data: {
+              id: `crawl-${emailLower.replace(/[@.]/g, "-")}-${Date.now()}`,
+              name: contact.name,
+              email: contact.email,
+              outlet: contact.outlet,
+              type: contact.type,
+              genre: contact.genre,
+              region: contact.region,
+              beat: contact.beat,
+              bio: contact.bio,
+              website: contact.url,
+              verified: false,
+              articleCount: 0,
+            },
+          });
+          existingEmails.add(emailLower);
+          result.contactsImported++;
+          result.contacts.push(contact);
+          result.emailsExtracted++;
+          log(`  ✓ Imported: ${email} (${blog.name})`);
+        } catch (err) {
+          if (String(err).includes("Unique constraint")) continue;
+          result.errors.push(`Import error for ${email}: ${err}`);
+        }
       }
     } catch (err) {
       result.errors.push(`Error crawling ${blog.name}: ${err}`);
     }
   }
 
-  log(`Extracted ${result.emailsExtracted} emails from ${allBlogs.length} blogs`);
-
-  // ── Stage 3: Import into database ─────────────────────────────────────────
-
-  log("Stage 3: Importing contacts into database...");
-
-  // Get existing emails to avoid duplicates
-  const existingEmails = new Set(
-    (await prisma.contact.findMany({ select: { email: true } })).map((c) => c.email.toLowerCase())
-  );
-
-  for (const contact of discovered) {
-    const emailLower = contact.email.toLowerCase();
-    if (existingEmails.has(emailLower)) continue;
-
-    try {
-      await prisma.contact.create({
-        data: {
-          id: `crawl-${emailLower.replace(/[@.]/g, "-")}-${Date.now()}`,
-          name: contact.name,
-          email: contact.email,
-          outlet: contact.outlet,
-          type: contact.type,
-          genre: contact.genre,
-          region: contact.region,
-          beat: contact.beat,
-          bio: contact.bio,
-          website: contact.url,
-          verified: false, // Crawled contacts start unverified
-          articleCount: 0,
-        },
-      });
-      existingEmails.add(emailLower);
-      result.contactsImported++;
-      result.contacts.push(contact);
-    } catch (err) {
-      // Skip duplicates silently
-      if (String(err).includes("Unique constraint")) continue;
-      result.errors.push(`Import error for ${contact.email}: ${err}`);
-    }
-  }
-
-  log(`Imported ${result.contactsImported} new contacts`);
+  log(`Imported ${result.contactsImported} new contacts from ${allBlogs.length} blogs`);
   log("Pipeline complete!");
 
   return result;
