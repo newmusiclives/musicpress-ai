@@ -95,6 +95,7 @@ export default function ContactsPage() {
     emailsExtracted: number;
     contactsImported: number;
     errors: string[];
+    message?: string;
   } | null>(null);
 
   // Cleanup state
@@ -281,8 +282,25 @@ export default function ContactsPage() {
       });
       if (res.ok) {
         const data = await res.json();
-        setImportResult(data);
-        fetchContacts(); // Refresh the list
+        if (data.message) {
+          // Background crawl started — show message and poll for new contacts
+          setImportResult({
+            blogsDiscovered: 0,
+            emailsExtracted: 0,
+            contactsImported: 0,
+            errors: [],
+            message: data.message,
+          });
+          // Poll every 10 seconds to refresh the contact list
+          const poll = setInterval(() => {
+            fetchContacts();
+          }, 10000);
+          // Stop polling after 20 minutes
+          setTimeout(() => clearInterval(poll), 20 * 60 * 1000);
+        } else {
+          setImportResult(data);
+          fetchContacts();
+        }
       } else {
         setImportResult({ blogsDiscovered: 0, emailsExtracted: 0, contactsImported: 0, errors: ["Crawl failed. Try again."] });
       }
@@ -711,8 +729,14 @@ export default function ContactsPage() {
               <div>
                 <div className="flex items-center gap-2 mb-4">
                   <CheckCircle2 className="w-5 h-5 text-success" />
-                  <span className="font-bold text-success">Crawl Complete</span>
+                  <span className="font-bold text-success">{importResult.message ? "Crawl Running" : "Crawl Complete"}</span>
                 </div>
+
+                {importResult.message && (
+                  <div className="bg-primary/10 border border-primary/20 rounded-xl p-3 mb-4">
+                    <p className="text-sm text-foreground/70">{importResult.message}</p>
+                  </div>
+                )}
 
                 <div className="grid grid-cols-3 gap-3 mb-4">
                   <div className="bg-surface-light rounded-xl p-3 text-center">

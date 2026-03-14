@@ -5,12 +5,13 @@
   "scripts": {
     "dev": "next dev",
     "build": "npx prisma generate && next build",
-    "start": "npx prisma migrate deploy && next start",
+    "start": "npx prisma migrate deploy && npx tsx prisma/seed.ts && next start",
     "postinstall": "npx prisma generate",
     "lint": "eslint",
     "db:seed": "npx tsx prisma/seed.ts",
     "db:reset": "npx prisma migrate reset --force",
-    "db:studio": "npx prisma studio"
+    "db:studio": "npx prisma studio",
+    "crawl": "npx tsx -r tsconfig-paths/register scripts/crawl-and-save.ts"
   },
   "prisma": {
     "seed": "npx tsx prisma/seed.ts"

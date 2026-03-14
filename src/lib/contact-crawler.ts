@@ -43,11 +43,16 @@ interface BlogEntry {
 const EMAIL_REGEX = /[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}/g;
 
 const IGNORED_EMAIL_DOMAINS = [
-  "example.com", "sentry.io", "wixpress.com", "w3.org",
+  "example.com", "sentry.io", "wixpress.com", "sentry-next.wixpress.com",
+  "sentry.wixpress.com", "w3.org",
   "schema.org", "wordpress.org", "wordpress.com", "gravatar.com",
   "google.com", "facebook.com", "twitter.com", "instagram.com",
   "cloudflare.com", "jsdelivr.net", "googleapis.com", "gstatic.com",
   "apple.com", "microsoft.com", "amazon.com", "youtube.com",
+  "godaddy.com", "mysite.com", "yoursite.com", "domain.com",
+  "email.com", "test.com", "localhost", "patreon.com",
+  "ingest.sentry.io", "trustpilot.com", "rss.com",
+  "wolfthemes.com", "gettyimages.com",
 ];
 
 const IGNORED_EMAIL_PREFIXES = [
@@ -72,6 +77,14 @@ function extractEmails(html: string): string[] {
     if (domain && localPart.includes(domain.split(".")[0])) return false;
     // Filter out very short local parts (likely junk)
     if (localPart.length < 3) return false;
+    // Filter out sentry hex IDs and UUID-style emails
+    if (/^[0-9a-f]{16,}$/i.test(localPart)) return false;
+    if (/^[0-9a-f]{8}-[0-9a-f]{4}-/i.test(localPart)) return false;
+    // Filter out emails where domain has extra text appended (e.g. user@site.comword)
+    if (/\.(com|net|org|io|co|uk|fm)[a-z]/i.test(domain)) return false;
+    // Filter out sentry ingest subdomains
+    if (domain && domain.includes("sentry")) return false;
+    if (domain && domain.includes("wixpress")) return false;
     return true;
   });
 }
@@ -208,6 +221,20 @@ async function crawlFeedspot(): Promise<BlogEntry[]> {
     "https://bloggers.feedspot.com/indie_music_blogs/",
     "https://bloggers.feedspot.com/electronic_music_blogs/",
     "https://bloggers.feedspot.com/hip_hop_blogs/",
+    "https://bloggers.feedspot.com/rock_music_blogs/",
+    "https://bloggers.feedspot.com/pop_music_blogs/",
+    "https://bloggers.feedspot.com/folk_music_blogs/",
+    "https://bloggers.feedspot.com/jazz_blogs/",
+    "https://bloggers.feedspot.com/rnb_blogs/",
+    "https://bloggers.feedspot.com/country_music_blogs/",
+    "https://bloggers.feedspot.com/metal_blogs/",
+    "https://bloggers.feedspot.com/punk_rock_blogs/",
+    "https://bloggers.feedspot.com/classical_music_blogs/",
+    "https://bloggers.feedspot.com/music_review_blogs/",
+    "https://bloggers.feedspot.com/music_production_blogs/",
+    "https://bloggers.feedspot.com/music_marketing_blogs/",
+    "https://bloggers.feedspot.com/music_pr_blogs/",
+    "https://bloggers.feedspot.com/music_business_blogs/",
   ];
 
   const blogs: BlogEntry[] = [];
@@ -329,6 +356,13 @@ async function crawlBlogListArticles(): Promise<BlogEntry[]> {
     "https://mastering.com/music-blogs/",
     "https://audiohype.io/resources/best-music-blogs/",
     "https://loudbeats.org/music/blogs-to-submit-music/",
+    "https://www.musicgateway.com/blog/music-blogs-to-submit-to",
+    "https://www.dittomusic.com/blog/best-music-blogs-to-submit-music-to",
+    "https://cymbal.fm/blog/music-blogs-accepting-submissions",
+    "https://www.groovermag.com/blog/best-music-blogs/",
+    "https://www.musicxray.com/blog/music-blogs",
+    "https://www.soundcharts.com/blog/music-blogs",
+    "https://flypaper.soundfly.com/hustle/music-blogs-submit-music/",
   ];
 
   const blogs: BlogEntry[] = [];
@@ -424,6 +458,82 @@ async function crawlJournalists(): Promise<BlogEntry[]> {
     // Music journalist curated lists
     "https://muckrack.com/media-outlet/pitchfork",
     "https://blog.feedspot.com/music_journalism_blogs/",
+    // Additional publications
+    "https://www.thefader.com/about",
+    "https://www.complex.com/about",
+    "https://www.loudersound.com/contact-us",
+    "https://www.theaquarian.com/contact/",
+    "https://www.tinymixtapes.com/about",
+    "https://www.drownedinsound.com/contact",
+    "https://www.treblezine.com/about/",
+    "https://www.thequietus.com/contact",
+    "https://www.bandcamp.com/contact",
+    "https://ra.co/about",
+    "https://djmag.com/contact",
+    "https://www.mixmag.net/contact",
+    "https://www.magnetmagazine.com/contact/",
+    "https://www.readdork.com/contact/",
+    "https://www.gigwise.com/about",
+    "https://www.musicomh.com/about",
+    "https://www.sputnikmusic.com/contact.php",
+    "https://www.albumoftheyear.org/about/",
+    "https://www.soundslikenashville.com/contact/",
+    "https://www.americansongwriter.com/contact/",
+    "https://www.savingcountrymusic.com/contact/",
+    // Electronic music press
+    "https://www.dancingastronaut.com/contact/",
+    "https://edm.com/contact",
+    "https://www.youredm.com/about/",
+    "https://www.magneticmag.com/contact/",
+    "https://www.attackmagazine.com/about/",
+    "https://www.electronicbeats.net/about/",
+    "https://www.residentadvisor.net/about",
+    // Metal / Rock press
+    "https://metalinjection.net/contact",
+    "https://www.metalsucks.net/contact/",
+    "https://www.revolvermag.com/contact",
+    "https://www.kerrang.com/contact",
+    "https://www.punknews.org/contact",
+    "https://www.invisibleoranges.com/about/",
+    "https://www.angrymetalguy.com/about/",
+    "https://www.heavyblogisheavy.com/contact/",
+    "https://www.theprp.com/contact/",
+    "https://www.deadpress.co.uk/about/",
+    // Country / Americana / Folk press
+    "https://www.nodepression.com/contact/",
+    "https://www.theboot.com/contact/",
+    "https://www.wideopencountry.com/contact/",
+    "https://tasteofcountry.com/contact/",
+    "https://www.roughstock.com/contact",
+    "https://www.thecountrynote.com/contact/",
+    "https://www.whiskeyriff.com/contact/",
+    // Latin / World press
+    "https://remezcla.com/about/",
+    "https://www.soundsandcolours.com/about/",
+    "https://worldmusiccentral.org/about/",
+    "https://www.afropunk.com/contact/",
+    // Industry / Business press
+    "https://www.hypebot.com/contact/",
+    "https://www.digitalmusicnews.com/contact/",
+    "https://musically.com/contact/",
+    "https://www.musicbusinessworldwide.com/contact/",
+    "https://completemusicupdate.com/contact/",
+    // Alt-weeklies / Regional
+    "https://www.austinchronicle.com/contact/",
+    "https://www.laweekly.com/contact/",
+    "https://www.sfweekly.com/contact/",
+    "https://www.chicagoreader.com/contact/",
+    "https://www.dallasobserver.com/contact/",
+    "https://www.phoenixnewtimes.com/contact/",
+    "https://www.westword.com/contact/",
+    "https://www.miaminewtimes.com/contact/",
+    "https://www.villagevoice.com/contact-us/",
+    // Additional Feedspot directories for journalists
+    "https://bloggers.feedspot.com/music_news_blogs/",
+    "https://bloggers.feedspot.com/music_magazine_blogs/",
+    "https://bloggers.feedspot.com/entertainment_journalists/",
+    "https://bloggers.feedspot.com/concert_blogs/",
+    "https://bloggers.feedspot.com/music_festival_blogs/",
   ];
 
   const blogs: BlogEntry[] = [];
@@ -490,6 +600,86 @@ async function crawlCurators(): Promise<BlogEntry[]> {
     "https://www.soundplate.com/contact/",
     "https://www.mysphera.co/curators",
     "https://www.tunemymusic.com/blog/spotify-playlist-curators",
+    "https://bloggers.feedspot.com/youtube_music_channels/",
+    "https://bloggers.feedspot.com/music_promotion_blogs/",
+    "https://www.submithub.com/blog/best-music-blogs",
+    "https://audiohype.io/resources/spotify-playlist-curators/",
+    "https://www.musicgateway.com/blog/spotify-playlist-curators",
+    "https://cymbal.fm/blog/playlist-curators",
+    // More curator directories
+    "https://bloggers.feedspot.com/soundcloud_music_blogs/",
+    "https://bloggers.feedspot.com/youtube_music_channels/",
+    "https://bloggers.feedspot.com/music_promotion_blogs/",
+    "https://bloggers.feedspot.com/music_discovery_blogs/",
+    "https://bloggers.feedspot.com/new_music_blogs/",
+    "https://bloggers.feedspot.com/music_playlist_blogs/",
+    "https://bloggers.feedspot.com/music_curation_blogs/",
+    // Curator submission platforms (contact/about pages)
+    "https://www.submithub.com/blog",
+    "https://www.musosoup.com/contact/",
+    "https://groover.co/en/about/",
+    "https://www.dailyplaylists.com/about/",
+    "https://www.soundplate.com/about/",
+    "https://www.kolibrimusic.com/contact",
+    "https://www.mysphera.co/about",
+    // Independent curator sites
+    "https://www.indieshuffle.com/contact/",
+    "https://theshuffle.com.au/contact/",
+    "https://www.stereostickman.com/contact/",
+    "https://www.musiccrowns.org/contact/",
+    "https://www.neonmusic.co.uk/contact",
+    "https://www.lefuturewave.com/contact/",
+    "https://www.chillfiltr.com/about/",
+    "https://www.twomelody.com/contact/",
+    // YouTube music channels
+    "https://www.mrsuicidesheep.com/contact/",
+    "https://www.proximity.net/contact/",
+    "https://www.majesticcasual.com/contact/",
+    "https://www.cloudkid.com/contact/",
+    "https://www.thevibeguide.com/contact/",
+    "https://www.chill.com/contact",
+    // Massive Feedspot curator expansion
+    "https://bloggers.feedspot.com/lofi_music_blogs/",
+    "https://bloggers.feedspot.com/edm_blogs/",
+    "https://bloggers.feedspot.com/house_music_blogs/",
+    "https://bloggers.feedspot.com/techno_blogs/",
+    "https://bloggers.feedspot.com/trance_blogs/",
+    "https://bloggers.feedspot.com/dubstep_blogs/",
+    "https://bloggers.feedspot.com/trap_music_blogs/",
+    "https://bloggers.feedspot.com/chill_music_blogs/",
+    "https://bloggers.feedspot.com/ambient_music_blogs/",
+    "https://bloggers.feedspot.com/rnb_music_blogs/",
+    "https://bloggers.feedspot.com/soul_music_blogs/",
+    "https://bloggers.feedspot.com/reggae_blogs/",
+    "https://bloggers.feedspot.com/latin_music_blogs/",
+    "https://bloggers.feedspot.com/kpop_blogs/",
+    "https://bloggers.feedspot.com/jpop_blogs/",
+    "https://bloggers.feedspot.com/afrobeats_blogs/",
+    "https://bloggers.feedspot.com/blues_blogs/",
+    "https://bloggers.feedspot.com/jazz_blogs/",
+    "https://bloggers.feedspot.com/country_music_blogs/",
+    "https://bloggers.feedspot.com/bluegrass_blogs/",
+    "https://bloggers.feedspot.com/americana_blogs/",
+    "https://bloggers.feedspot.com/singer_songwriter_blogs/",
+    "https://bloggers.feedspot.com/acoustic_music_blogs/",
+    "https://bloggers.feedspot.com/music_video_blogs/",
+    "https://bloggers.feedspot.com/music_licensing_blogs/",
+    "https://bloggers.feedspot.com/dj_blogs/",
+    "https://bloggers.feedspot.com/vinyl_blogs/",
+    "https://bloggers.feedspot.com/music_gear_blogs/",
+    "https://bloggers.feedspot.com/music_education_blogs/",
+    "https://bloggers.feedspot.com/music_therapy_blogs/",
+    // Curator-specific article sources
+    "https://www.soundplate.com/best-spotify-playlist-curators/",
+    "https://www.soundplate.com/spotify-playlist-curators/",
+    "https://www.dailyplaylists.com/blog/best-spotify-playlist-curators/",
+    "https://www.dittomusic.com/blog/spotify-playlist-curators",
+    "https://www.musicgateway.com/blog/how-to-submit-music-to-spotify-playlists",
+    "https://audiohype.io/resources/spotify-playlist-curators/",
+    "https://www.recordlabel.store/blogs/music-marketing/spotify-playlist-curators",
+    "https://blog.landr.com/spotify-playlist-curators/",
+    "https://www.tunecore.com/blog/best-spotify-playlist-curators",
+    "https://www.makeitsupersound.com/blog/spotify-playlist-curators",
   ];
 
   const blogs: BlogEntry[] = [];
