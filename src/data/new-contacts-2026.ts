@@ -2089,6 +2089,56 @@ export const playlistCurators: Contact[] = [
     bio: "Underground music curator with over 3M monthly views. Runs lofi hip-hop channels dedicated to supporting independent music. Source: amuse.io, playlistpartner.com",
     articleCount: 0,
   },
+  {
+    name: "LoFi Fruits / Strange Fruits",
+    email: "lofi@strangefruits.net",
+    outlet: "LoFi Fruits / Strange Fruits (Spotify)",
+    genre: "Lo-Fi, Hip-Hop, Chill, Tropical House, Deep House",
+    region: "Global",
+    beat: "Spotify playlist curator - 7.3M followers, most-followed non-editorial playlist",
+    bio: "Strange Fruits B.V. label with sub-labels Lofi Fruits and Ambient Fruits. Most followed independent playlist curator on Spotify. Source: lofifruitsmusic.com, routenote.com blog",
+    articleCount: 0,
+  },
+  {
+    name: "Aux London",
+    email: "hello@auxlondon.com",
+    outlet: "Aux London (SoundCloud/Spotify/YouTube)",
+    genre: "Deep House, Melodic House, Electronic",
+    region: "UK",
+    beat: "Online music magazine & curator",
+    bio: "London-based online music magazine where listeners, producers and makers unite to bring new music. Source: auxlondon.com, soundcloud.com/auxlondon",
+    articleCount: 0,
+  },
+  {
+    name: "Heldeep Records (General)",
+    email: "info@oliverheldens.com",
+    outlet: "Heldeep Records (YouTube/Spotify)",
+    genre: "House, Future House, Electronic, EDM",
+    region: "Global",
+    beat: "General contact - Oliver Heldens' label",
+    bio: "General contact for Heldeep Records. Source: labelsbase.net/heldeep-records",
+    articleCount: 0,
+  },
+  {
+    name: "Lowly",
+    email: "hello@lowly.io",
+    outlet: "Lowly (YouTube/Spotify)",
+    genre: "Electronic, Indie Electronic, Dance",
+    region: "US",
+    beat: "Independent label (Trap Nation sister) - est. 2017",
+    bio: "Independent record label born from Trap Nation, based in NY/LA. Free to use on YouTube/SoundCloud. Demo submissions via LabelRadar. Source: lowly.io/contact",
+    articleCount: 0,
+  },
+  {
+    name: "UKF",
+    email: "demos@ukf.com",
+    outlet: "UKF / UKF Dubstep (YouTube)",
+    genre: "Dubstep, DnB, UKG, Bassline, Bass House",
+    region: "UK",
+    beat: "YouTube music promotion - 6.1M subscribers (UKF Dubstep)",
+    bio: "The home of bass music since 2009. Covers D&B, dubstep, UKG, bassline, bass house. Submission page at ukf.com/submit-your-demo. Source: ukf.com",
+    articleCount: 0,
+  },
 ];
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -2192,3 +2242,80 @@ export const allGenreContacts = [
 // - Country Standard Time: Used gmail contact (listed above)
 // - American Songwriter: General email listed but not for press/submissions specifically
 // - Paste Magazine: No specific music editor email public
+//
+// PLAYLIST CURATORS / YOUTUBE CHANNELS / SOUNDCLOUD (2026-03-14):
+//
+// YOUTUBE MUSIC PROMOTION CHANNELS:
+// - MrSuicideSheep: demo@mrsuicidesheep.com, contact@mrsuicidesheep.com (mrsuicidesheep.com, labelsbase.net)
+// - Seeking Blue Records: info@seeking.blue (seeking.blue/contact)
+// - Proximity: blake@prxmusic.com (facebook.com/proximity, linkedin.com/in/coppelson)
+// - Trap Nation: andre@nations.io (labelsbase.net/trap-nation, nations.io)
+// - House Nation: isac.jivhed@nations.io (labelradar.com/labels/housenation)
+// - Trap City: officialtrapcity@gmail.com (labelsbase.net/trap-city)
+// - MrRevillz: info@mrrevillz.com, ashley@mrrevillz.com (mrrevillz.com, submithub.com/blog/mrrevillz)
+// - IndieAir: indieairsubmissions@gmail.com (submithub.com/blog/indieair, hypebot.com)
+// - Bandit Tunes: bandittunespromotions@gmail.com (symphonic.com blog)
+// - Monstercat: press@monstercat.com (monstercat.com/contact-us)
+// - NoCopyrightSounds: hello@nocopyrightsounds.co.uk (ncs.io/contact)
+// - Selected.: inbox@selectedbase.com, info@selectedbase.com (selectedbase.com/submit, soundcloud.com/selectedbase)
+// - La Belle Musique: rubin@labellemusique.co (groover.co, labelsbase.net)
+// - Majestic Casual: nick@majesticcasual.com (majesticcasual.com)
+// - The Vibe Guide: info@thevibeguide.net (thevibeguide.net/contact)
+// - ElectroPose: submission@electro-pose.com, contact@electro-pose.com (influencerwiki.fr/electropose-musique)
+// - Koala Kontrol: koalakontrol@gmail.com (facebook.com/KoalaKontrol)
+// - CloudKid: hello@cloudkid.com, sync@cldkid.com (cloudkid.com/contact, soundcloud.com/cloudkid)
+// - Fluidified: contact@fluidified.com (noxinfluencer.com, socialblade.com)
+// - MrDeepSense: contact@mrdeepsense.com (soundcloud.com/mrdeepsense)
+// - Nik Cooper: info@nikcooper.com (youredm.com interview)
+// - xKito Music: xkitomusic@gmail.com (tiktok.com/@xkito.music)
+// - SwagyTracks: swagytracks@gmail.com (thehandbook.com/creator/swagytracks)
+// - alexrainbirdMusic: alexrainbirdmusic@gmail.com (alexrainbirdmusic.com, musicgateway.com)
+// - AirwaveMusicTV: airwavemusictv@gmail.com (groover.co, bassmusic.fandom.com)
+// - TheSoundYouNeed: tsyn.thesoundyouneed@gmail.com (thesoundyouneed-blog.tumblr.com/contact)
+// - Tribal Trap: submissions@tribaltrap.com (tribalmusicgroup.com/submissions)
+// - COLORS Studios: submit@colorsxstudios.com (colorsxstudios.com/submit)
+// - Cakes & Eclairs: hello@soundicate.pro (spgl.ink/cakesandeclairs)
+// - Wave Music: wavemusicyt@gmail.com (submithub.com/blog/wavemusic)
+// - MixHound Music Records: mixhoundmusicrecords@gmail.com (soundcloud.com/mixhound-music-records)
+// - UKF: demos@ukf.com (ukf.com/submit-your-demo)
+// - Lowly: hello@lowly.io (lowly.io/contact)
+//
+// MUSIC BLOGS/YOUTUBE CROSSOVER:
+// - Run The Trap: rttsubmit@gmail.com (runthetrap.com/contact-us)
+// - Akira The Don: enquiries@meaningwave.com (akirathedon.com/contact)
+//
+// SOUNDCLOUD REPOST NETWORKS:
+// - HMWL: pr@hmwl.org, demos@hmwl.org (housemusicwithlove.com)
+// - GANGSTER BASS: gangsterbassofficial@gmail.com (soundcloud.com/gangsterbass)
+// - GANGSTER TRAP: pnwsgrp@gmail.com (soundcloud.com/gangster-trap)
+//
+// SPOTIFY PLAYLIST CURATORS:
+// - Promoting Sounds: promotingsoundsspotify@gmail.com (jouzik.com, artist.tools)
+// - Today's Rap Hits: todaysraphits@gmail.com (jouzik.com)
+// - The Buzz Network: info@thebuzznetwork.net (thebuzznetwork.net)
+// - LoFi Cafe Records: info@loficaferecords.com (loficaferecords.com)
+// - Indiemono: hello@indiemono.com (indiemono.com/music-submit)
+// - Eclipse Records: info@eclipserecords.com (eclipserecords.com/spotify-playlist-submission)
+// - Le Future Wave: info@lefuturewave.com (lefuturewave.com)
+// - Stereofox: hello@stereofox.com (stereofox.com)
+// - Ryan Celsius: ryancelsius@gmail.com (amuse.io, playlistpartner.com)
+// - LoFi Fruits / Strange Fruits: lofi@strangefruits.net (lofifruitsmusic.com)
+// - Steezyasfuck: steezy@stzzzy.com (stzzzy.com/submissions)
+//
+// RECORD LABELS (YouTube/Spotify with demo submissions):
+// - Spinnin' Records: demo@spinninrecords.nl, info@spinninrecords.nl (labelsbase.net/spinnin-records)
+// - Chillhop Music: info@chillhop.com (chillhop.com/contact)
+// - Lofi Girl: music@lofigirl.com (lofigirl.com/contact)
+// - Heldeep Records: heldeepradio@gmail.com, info@oliverheldens.com (labelsbase.net/heldeep-records)
+// - Future Classic: info@futureclassic.us (futureclassic.us/pages/contact-us)
+// - Trap and Bass: submissions@trapandbass.com (trapandbass.com)
+// - Aux London: hello@auxlondon.com (auxlondon.com, soundcloud.com/auxlondon)
+//
+// CURATORS WHERE NO DIRECT EMAIL WAS FOUND (use SubmitHub/LabelRadar/portal instead):
+// - Chill Nation / Bass Nation / Rap Nation: Use nations.io submission portals or LabelRadar
+// - Sensual Musique / The Good Life Radio: Use JotForm submission or SubmitHub
+// - ChillYourMind: Use LabelRadar or SubmitHub (chillyourmind.com/submission)
+// - GalaxyMusic: Check YouTube about page
+// - Hype Machine: Organic blog discovery, no direct artist submission
+// - Deezer editorial: No public curator emails, use Deezer for Creators
+// - Apple Music editorial: No public curator emails, use Apple Music for Artists

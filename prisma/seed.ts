@@ -556,6 +556,80 @@ async function main() {
     { name: "Promoting Sounds", email: "promotingsounds@gmail.com", outlet: "Promoting Sounds", genre: "EDM, Trap, Future Bass, Chill", region: "Global", beat: "SoundCloud/YouTube Curator", bio: "Music promotion channel. Source: bigcartel contact.", articleCount: 0 },
     { name: "Amazon Music Submissions", email: "music-submissions@amazon.com", outlet: "Amazon Music", genre: "All Genres", region: "Global", beat: "Amazon Music Playlists", bio: "Amazon Music playlist submissions. Source: multiple public sources.", articleCount: 0 },
     { name: "Musicto Curators", email: "submit@musicto.com", outlet: "Musicto", genre: "All Genres", region: "Global", beat: "Spotify & Apple Music Playlists", bio: "Independent playlist community 500+ playlists. Source: musicto.com.", articleCount: 0 },
+
+    // ══════════════════════════════════════════════════════════════════════
+    // YOUTUBE MUSIC CHANNELS & LABELS
+    // ══════════════════════════════════════════════════════════════════════
+    { name: "MrSuicideSheep Demos", email: "demo@mrsuicidesheep.com", outlet: "MrSuicideSheep (YouTube)", genre: "Electronic, Chill, Alternative", region: "Global", beat: "YouTube Curator 15M+ subs", bio: "Source: mrsuicidesheep.com.", articleCount: 0 },
+    { name: "MrSuicideSheep Contact", email: "contact@mrsuicidesheep.com", outlet: "MrSuicideSheep (YouTube)", genre: "Electronic, Chill, Alternative", region: "Global", beat: "General", bio: "Source: mrsuicidesheep.com.", articleCount: 0 },
+    { name: "Seeking Blue Records", email: "info@seeking.blue", outlet: "Seeking Blue Records", genre: "Electronic, Indie-Electronic", region: "Global", beat: "Label from MrSuicideSheep", bio: "Source: seeking.blue/contact.", articleCount: 0 },
+    { name: "Proximity (Blake)", email: "blake@prxmusic.com", outlet: "Proximity (YouTube)", genre: "Electronic, Future Bass, Dance", region: "US", beat: "YouTube Curator", bio: "Source: facebook.com/proximity.", articleCount: 0 },
+    { name: "House Nation", email: "isac.jivhed@nations.io", outlet: "House Nation (YouTube)", genre: "House, Deep House, Dance", region: "Global", beat: "YouTube House Music", bio: "Part of Nations network. Source: labelradar.com.", articleCount: 0 },
+    { name: "Trap City", email: "officialtrapcity@gmail.com", outlet: "Trap City (YouTube)", genre: "Trap, Future Bass, EDM", region: "Global", beat: "YouTube 14M+ subs", bio: "Source: labelsbase.net.", articleCount: 0 },
+    { name: "MrRevillz Submissions", email: "info@mrrevillz.com", outlet: "MrRevillz (YouTube)", genre: "House, Dance, Electronic", region: "UK", beat: "YouTube Curator & Label", bio: "Source: mrrevillz.com.", articleCount: 0 },
+    { name: "MrRevillz Business", email: "ashley@mrrevillz.com", outlet: "MrRevillz (YouTube)", genre: "House, Dance, Electronic", region: "UK", beat: "Business", bio: "Source: mrrevillz.com.", articleCount: 0 },
+    { name: "IndieAir", email: "indieairsubmissions@gmail.com", outlet: "IndieAir (YouTube)", genre: "Alternative, Indie Rock, Indie Pop", region: "US", beat: "YouTube 1.4M subs", bio: "Public email.", articleCount: 0 },
+    { name: "Bandit Tunes", email: "bandittunespromotions@gmail.com", outlet: "Bandit Tunes (YouTube)", genre: "Indie, Electronic, Chill", region: "Global", beat: "YouTube Curator", bio: "Public email.", articleCount: 0 },
+    { name: "Monstercat Press", email: "press@monstercat.com", outlet: "Monstercat (YouTube/Label)", genre: "Electronic, EDM, Dubstep, DnB", region: "Global", beat: "Press 7.5M+ subs", bio: "Source: monstercat.com.", articleCount: 0 },
+    { name: "Selected. Demos", email: "inbox@selectedbase.com", outlet: "Selected. (YouTube)", genre: "House, Deep House, Dance", region: "Global", beat: "YouTube/Label Berlin", bio: "Source: selectedbase.com.", articleCount: 0 },
+    { name: "Selected. General", email: "info@selectedbase.com", outlet: "Selected. (YouTube)", genre: "House, Deep House, Dance", region: "Global", beat: "General", bio: "Source: soundcloud.com/selectedbase.", articleCount: 0 },
+    { name: "La Belle Musique", email: "rubin@labellemusique.co", outlet: "La Belle Musique (YouTube)", genre: "Chill, Electronic, Indie, Pop", region: "Global", beat: "YouTube Curator", bio: "Source: groover.co.", articleCount: 0 },
+    { name: "Majestic Casual (Nick)", email: "nick@majesticcasual.com", outlet: "Majestic Casual (YouTube)", genre: "Chill, Electronic, Indie, R&B", region: "Global", beat: "YouTube 4.3M subs", bio: "Source: majesticcasual.com.", articleCount: 0 },
+    { name: "The Vibe Guide Alt", email: "info@thevibeguide.net", outlet: "The Vibe Guide (YouTube)", genre: "House, Dance, Electronic", region: "US", beat: "YouTube Lyric Videos", bio: "Source: thevibeguide.net.", articleCount: 0 },
+    { name: "ElectroPose Submissions", email: "submission@electro-pose.com", outlet: "ElectroPose (YouTube)", genre: "Deep House, Nu Disco, Lounge", region: "Global", beat: "YouTube Curator", bio: "Source: electro-pose.com.", articleCount: 0 },
+    { name: "ElectroPose Business", email: "contact@electro-pose.com", outlet: "ElectroPose (YouTube)", genre: "Deep House, Nu Disco, Lounge", region: "Global", beat: "Business", bio: "Source: electro-pose.com.", articleCount: 0 },
+    { name: "Koala Kontrol", email: "koalakontrol@gmail.com", outlet: "Koala Kontrol (YouTube)", genre: "Indie Electronic, Alternative", region: "Global", beat: "YouTube 1.4M subs", bio: "Source: koalakontrol.com.", articleCount: 0 },
+    { name: "CloudKid Hello", email: "hello@cloudkid.com", outlet: "CloudKid (YouTube)", genre: "Chill, Indie, Electronic", region: "Global", beat: "YouTube 4.7M subs", bio: "Source: cloudkid.com.", articleCount: 0 },
+    { name: "CloudKid Sync", email: "sync@cldkid.com", outlet: "CloudKid (YouTube)", genre: "Chill, Indie, Electronic", region: "Global", beat: "Sync & Licensing", bio: "Source: soundcloud.com/cloudkid.", articleCount: 0 },
+    { name: "Fluidified Contact", email: "contact@fluidified.com", outlet: "Fluidified (YouTube)", genre: "Chill, Electronic, Deep House", region: "Global", beat: "YouTube 850K subs", bio: "Public email.", articleCount: 0 },
+    { name: "MrDeepSense", email: "contact@mrdeepsense.com", outlet: "MrDeepSense (YouTube)", genre: "Deep House, Nu Disco, House", region: "Global", beat: "YouTube Curator", bio: "Source: mrdeepsense.com.", articleCount: 0 },
+    { name: "Nik Cooper", email: "info@nikcooper.com", outlet: "Nik Cooper Music (YouTube)", genre: "Electronic, EDM, House", region: "Global", beat: "YouTube 880K subs", bio: "Source: nikcooper.com.", articleCount: 0 },
+    { name: "SwagyTracks", email: "swagytracks@gmail.com", outlet: "SwagyTracks (YouTube)", genre: "Hip Hop, Indie Hip Hop, R&B", region: "Global", beat: "YouTube Hip Hop Curator", bio: "Public email.", articleCount: 0 },
+    { name: "Run The Trap Submit", email: "rttsubmit@gmail.com", outlet: "Run The Trap (YouTube)", genre: "Trap, EDM, Hip Hop, Bass", region: "US", beat: "Blog/YouTube Submissions", bio: "Source: runthetrap.com.", articleCount: 0 },
+
+    // ══════════════════════════════════════════════════════════════════════
+    // SOUNDCLOUD REPOST NETWORKS
+    // ══════════════════════════════════════════════════════════════════════
+    { name: "HMWL PR", email: "pr@hmwl.org", outlet: "House Music With Love", genre: "Deep House, Afro House, Melodic House", region: "Global", beat: "SoundCloud 200+ channels 12M followers", bio: "Source: hmwl.org.", articleCount: 0 },
+    { name: "HMWL Demos", email: "demos@hmwl.org", outlet: "House Music With Love", genre: "Deep House, Afro House, Melodic House", region: "Global", beat: "Demo Submissions", bio: "Source: housemusicwithlove.com.", articleCount: 0 },
+    { name: "GANGSTER BASS", email: "gangsterbassofficial@gmail.com", outlet: "GANGSTER BASS (SoundCloud)", genre: "Trap, Bass, Hip Hop", region: "Global", beat: "SoundCloud/YouTube", bio: "Public email.", articleCount: 0 },
+    { name: "GANGSTER TRAP", email: "pnwsgrp@gmail.com", outlet: "GANGSTER TRAP (SoundCloud)", genre: "Trap, Hip Hop", region: "Global", beat: "SoundCloud/YouTube", bio: "Public email.", articleCount: 0 },
+
+    // ══════════════════════════════════════════════════════════════════════
+    // SPOTIFY PLAYLIST CURATORS
+    // ══════════════════════════════════════════════════════════════════════
+    { name: "Promoting Sounds Spotify", email: "promotingsoundsspotify@gmail.com", outlet: "Promoting Sounds (Spotify)", genre: "Rap, Hip Hop, Trap, Lo-Fi", region: "Global", beat: "Spotify 20 playlists 1.9M followers", bio: "Source: jouzik.com.", articleCount: 0 },
+    { name: "Today's Rap Hits", email: "todaysraphits@gmail.com", outlet: "Today's Rap Hits (Spotify)", genre: "Rap, Hip Hop, Trap", region: "US", beat: "Spotify Hip Hop Curator", bio: "Source: jouzik.com.", articleCount: 0 },
+    { name: "The Buzz Network", email: "info@thebuzznetwork.net", outlet: "The Buzz Network (Spotify)", genre: "Afrobeats, Amapiano, Hip Hop", region: "Global", beat: "Spotify Curator", bio: "Source: thebuzznetwork.net.", articleCount: 0 },
+    { name: "LoFi Cafe Records", email: "info@loficaferecords.com", outlet: "LoFi Cafe Records (Spotify)", genre: "Lo-Fi, Chillhop, Beats", region: "UK", beat: "Lo-Fi Label & Curator", bio: "Source: loficaferecords.com.", articleCount: 0 },
+    { name: "Indiemono Hello", email: "hello@indiemono.com", outlet: "Indiemono (Spotify)", genre: "Indie, Alternative, Singer-Songwriter", region: "Global", beat: "Spotify Indie Curator", bio: "Source: indiemono.com.", articleCount: 0 },
+    { name: "Eclipse Records Playlist", email: "info@eclipserecords.com", outlet: "Eclipse Records (Spotify)", genre: "Rock, Metal, Hard Rock, Punk", region: "US", beat: "Spotify Rock/Metal Curator", bio: "Source: eclipserecords.com.", articleCount: 0 },
+    { name: "Stereofox", email: "hello@stereofox.com", outlet: "Stereofox (Spotify/YouTube)", genre: "Lo-Fi, Chill, Electronic, Indie", region: "Global", beat: "Music Discovery Platform", bio: "Source: stereofox.com.", articleCount: 0 },
+    { name: "Ryan Celsius", email: "ryancelsius@gmail.com", outlet: "Ryan Celsius (YouTube/Spotify)", genre: "Lo-Fi, Underground Hip Hop", region: "US", beat: "Curator 3M+ monthly views", bio: "Public email.", articleCount: 0 },
+    { name: "LoFi Fruits / Strange Fruits", email: "lofi@strangefruits.net", outlet: "LoFi Fruits (Spotify)", genre: "Lo-Fi, Chill, Deep House", region: "Global", beat: "Spotify 7.3M followers #1 indie curator", bio: "Source: strangefruits.net.", articleCount: 0 },
+
+    // ══════════════════════════════════════════════════════════════════════
+    // LABELS WITH YOUTUBE/SPOTIFY PRESENCE
+    // ══════════════════════════════════════════════════════════════════════
+    { name: "Spinnin' Records Demos", email: "demo@spinninrecords.nl", outlet: "Spinnin' Records", genre: "EDM, House, Dance", region: "Global", beat: "Demo Submissions", bio: "Source: spinninrecords.nl.", articleCount: 0 },
+    { name: "Spinnin' Records Info", email: "info@spinninrecords.nl", outlet: "Spinnin' Records", genre: "EDM, House, Dance", region: "Global", beat: "General", bio: "Source: spinninrecords.nl.", articleCount: 0 },
+    { name: "Lofi Girl Music", email: "music@lofigirl.com", outlet: "Lofi Girl (YouTube)", genre: "Lo-Fi, Chill, Beats", region: "Global", beat: "YouTube Lo-Fi 6M+ subs", bio: "Source: lofigirl.com.", articleCount: 0 },
+    { name: "Meaningwave/Akira The Don", email: "enquiries@meaningwave.com", outlet: "Akira The Don (YouTube)", genre: "Electronic, Meaningwave, Hip Hop", region: "UK", beat: "YouTube Creator", bio: "Source: akirathedon.com.", articleCount: 0 },
+    { name: "Cakes & Eclairs Alt", email: "hello@soundicate.pro", outlet: "Cakes & Eclairs (YouTube)", genre: "Pop, Electronic, Lyric Videos", region: "US", beat: "YouTube Lyric Videos", bio: "Source: soundicate.pro.", articleCount: 0 },
+    { name: "Steezyasfuck", email: "steezy@stzzzy.com", outlet: "Steezyasfuck (YouTube)", genre: "Lo-Fi, Instrumental Hip Hop", region: "US", beat: "YouTube/SC Curator LA", bio: "Source: stzzzy.com.", articleCount: 0 },
+    { name: "Trap and Bass", email: "submissions@trapandbass.com", outlet: "Trap and Bass (YouTube)", genre: "Trap, Bass, Electronic", region: "Global", beat: "YouTube/SC/Spotify", bio: "Source: trapandbass.com.", articleCount: 0 },
+    { name: "COLORS Studios", email: "submit@colorsxstudios.com", outlet: "COLORS Studios (YouTube)", genre: "All Genres, R&B, Hip Hop, Pop", region: "Global", beat: "YouTube 8M+ subs Berlin", bio: "Source: colorsxstudios.com.", articleCount: 0 },
+    { name: "Tribal Trap", email: "submissions@tribaltrap.com", outlet: "Tribal Trap (YouTube)", genre: "Trap, Bass, Electronic", region: "Global", beat: "YouTube/Spotify Label", bio: "Source: tribaltrap.com.", articleCount: 0 },
+    { name: "AirwaveMusicTV", email: "airwavemusictv@gmail.com", outlet: "AirwaveMusicTV (YouTube)", genre: "Electronic, EDM, Bass", region: "Global", beat: "YouTube 3M+ subs", bio: "Public email.", articleCount: 0 },
+    { name: "TheSoundYouNeed", email: "tsyn.thesoundyouneed@gmail.com", outlet: "TheSoundYouNeed (YouTube)", genre: "Electronic, Indie, Chill", region: "Global", beat: "YouTube Curator", bio: "Public email.", articleCount: 0 },
+    { name: "Wave Music YT", email: "wavemusicyt@gmail.com", outlet: "Wave Music (YouTube)", genre: "Chill, Electronic, Lo-Fi", region: "Global", beat: "YouTube/SC Curator", bio: "Public email.", articleCount: 0 },
+    { name: "MixHound Music", email: "mixhoundmusicrecords@gmail.com", outlet: "MixHound (YouTube)", genre: "Chill, Electronic, Chillstep", region: "Global", beat: "YouTube/SC Curator & Label", bio: "Public email.", articleCount: 0 },
+    { name: "Heldeep Records", email: "heldeepradio@gmail.com", outlet: "Heldeep Records", genre: "House, Future House, EDM", region: "Global", beat: "Oliver Heldens Label", bio: "Source: labelsbase.net.", articleCount: 0 },
+    { name: "Future Classic", email: "info@futureclassic.us", outlet: "Future Classic", genre: "Electronic, Indie, Pop", region: "Global", beat: "Label (Flume, Chet Faker)", bio: "Source: futureclassic.us.", articleCount: 0 },
+    { name: "Lowly", email: "hello@lowly.io", outlet: "Lowly (YouTube/Spotify)", genre: "Electronic, Indie Electronic", region: "US", beat: "Label from Trap Nation", bio: "Source: lowly.io.", articleCount: 0 },
+    { name: "UKF Demos", email: "demos@ukf.com", outlet: "UKF (YouTube)", genre: "Dubstep, DnB, Bass, UKG", region: "UK", beat: "YouTube 6.1M subs", bio: "Source: ukf.com.", articleCount: 0 },
+    { name: "Heldeep General", email: "info@oliverheldens.com", outlet: "Heldeep Records", genre: "House, Future House, EDM", region: "Global", beat: "General", bio: "Source: labelsbase.net.", articleCount: 0 },
+    { name: "Aux London Alt", email: "hello@auxlondon.com", outlet: "Aux London (SC/Spotify)", genre: "Deep House, Melodic House", region: "UK", beat: "Online Magazine & Curator", bio: "Source: auxlondon.com.", articleCount: 0 },
   ];
 
   const blogs = [
