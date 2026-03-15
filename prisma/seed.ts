@@ -6,6 +6,7 @@ import { expandedSeedContacts, expandedContactCounts } from "./seed-contacts-exp
 import { radioSeedContacts } from "./seed-radio";
 import { blogJournalistSeedContacts } from "./seed-blogs-journalists";
 import { curatorPodcasterSeedContacts } from "./seed-curators-podcasters";
+import { genreFocusedSeedContacts } from "./seed-batch3-genres";
 
 const prisma = new PrismaClient();
 
@@ -1002,6 +1003,49 @@ async function main() {
   }
 
   console.log(`Upserted ${batch2Upserted} batch 2 contacts`);
+
+  // ─── Batch 3 Seed Contacts (Genre-Focused: Country, Americana, Folk, Pop, R&B, Jazz, Classical, Latin, Electronic, Metal, Hip Hop) ──
+  const batch3Contacts = [...genreFocusedSeedContacts];
+  console.log(`Seeding ${batch3Contacts.length} batch 3 genre-focused contacts...`);
+
+  let batch3Upserted = 0;
+  for (const contact of batch3Contacts) {
+    try {
+      await prisma.contact.upsert({
+        where: { id: contact.id },
+        update: {
+          name: contact.name,
+          outlet: contact.outlet,
+          type: contact.type,
+          genre: contact.genre,
+          region: contact.region,
+          beat: contact.beat,
+          bio: contact.bio,
+          website: contact.website,
+          articleCount: contact.articleCount,
+        },
+        create: {
+          id: contact.id,
+          name: contact.name,
+          email: contact.email,
+          outlet: contact.outlet,
+          type: contact.type,
+          genre: contact.genre,
+          region: contact.region,
+          beat: contact.beat,
+          bio: contact.bio,
+          website: contact.website,
+          verified: contact.verified,
+          articleCount: contact.articleCount,
+        },
+      });
+      batch3Upserted++;
+    } catch (err) {
+      // skip duplicates
+    }
+  }
+
+  console.log(`Upserted ${batch3Upserted} batch 3 genre-focused contacts`);
 
   // ─── Pitch Requests ───────────────────────────────────────────────────────
 
