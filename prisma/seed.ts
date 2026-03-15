@@ -3,6 +3,9 @@ import bcrypt from "bcryptjs";
 import * as fs from "fs";
 import * as path from "path";
 import { expandedSeedContacts, expandedContactCounts } from "./seed-contacts-expanded";
+import { radioSeedContacts } from "./seed-radio";
+import { blogJournalistSeedContacts } from "./seed-blogs-journalists";
+import { curatorPodcasterSeedContacts } from "./seed-curators-podcasters";
 
 const prisma = new PrismaClient();
 
@@ -952,6 +955,53 @@ async function main() {
   }
 
   console.log(`Upserted ${expandedUpserted} expanded contacts`);
+
+  // ─── Batch 2 Seed Contacts (Radio, Blogs, Journalists, Curators, Podcasters) ──
+  const batch2Contacts = [
+    ...radioSeedContacts,
+    ...blogJournalistSeedContacts,
+    ...curatorPodcasterSeedContacts,
+  ];
+  console.log(`Seeding ${batch2Contacts.length} batch 2 contacts (${radioSeedContacts.length} radio, ${blogJournalistSeedContacts.length} blogs+journalists, ${curatorPodcasterSeedContacts.length} curators+podcasters)...`);
+
+  let batch2Upserted = 0;
+  for (const contact of batch2Contacts) {
+    try {
+      await prisma.contact.upsert({
+        where: { id: contact.id },
+        update: {
+          name: contact.name,
+          outlet: contact.outlet,
+          type: contact.type,
+          genre: contact.genre,
+          region: contact.region,
+          beat: contact.beat,
+          bio: contact.bio,
+          website: contact.website,
+          articleCount: contact.articleCount,
+        },
+        create: {
+          id: contact.id,
+          name: contact.name,
+          email: contact.email,
+          outlet: contact.outlet,
+          type: contact.type,
+          genre: contact.genre,
+          region: contact.region,
+          beat: contact.beat,
+          bio: contact.bio,
+          website: contact.website,
+          verified: contact.verified,
+          articleCount: contact.articleCount,
+        },
+      });
+      batch2Upserted++;
+    } catch (err) {
+      // skip duplicates
+    }
+  }
+
+  console.log(`Upserted ${batch2Upserted} batch 2 contacts`);
 
   // ─── Pitch Requests ───────────────────────────────────────────────────────
 
