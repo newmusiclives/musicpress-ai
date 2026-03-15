@@ -28,6 +28,7 @@ import {
   Zap,
   CheckCircle2,
   LinkIcon,
+  Radio,
 } from "lucide-react";
 
 interface Contact {
@@ -49,6 +50,7 @@ const categories = [
   { id: "curator", label: "Curators", icon: Headphones },
   { id: "blog", label: "Blogs", icon: Globe },
   { id: "podcaster", label: "Podcasters", icon: Mic2 },
+  { id: "radio", label: "Radio", icon: Radio },
 ];
 
 const genres = [
@@ -644,13 +646,14 @@ export default function ContactsPage() {
                   <label className="text-xs text-foreground/50 mb-2 block">Crawl Source</label>
                   <div className="grid grid-cols-3 gap-2">
                     {[
-                      { id: "all", label: "All Sources", desc: "Blogs + Journalists + Curators + Podcasters", icon: Zap },
+                      { id: "all", label: "All Sources", desc: "Blogs + Journalists + Curators + Podcasters + Radio", icon: Zap },
                       { id: "feedspot", label: "Feedspot", desc: "Music blog directories", icon: Globe },
                       { id: "hypemachine", label: "Hype Machine", desc: "Indexed music blogs", icon: Headphones },
                       { id: "articles", label: "Blog Lists", desc: "Curated article lists", icon: Newspaper },
                       { id: "journalists", label: "Journalists", desc: "Music journalists & critics", icon: Users },
                       { id: "curators", label: "Curators", desc: "Spotify & playlist curators", icon: ListMusic },
                       { id: "podcasters", label: "Podcasters", desc: "Music podcast hosts", icon: Podcast },
+                      { id: "radio", label: "Radio", desc: "College & indie radio stations", icon: Radio },
                     ].map((s) => (
                       <button
                         key={s.id}

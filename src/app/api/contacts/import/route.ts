@@ -4,7 +4,7 @@ import { getAuthUser } from "@/lib/session";
 import { z } from "zod/v4";
 
 const importContactsSchema = z.object({
-  source: z.enum(["all", "feedspot", "hypemachine", "articles", "journalists", "curators", "podcasters"]).optional(),
+  source: z.enum(["all", "feedspot", "hypemachine", "articles", "journalists", "curators", "podcasters", "radio"]).optional(),
   urls: z.array(z.url("Each URL must be a valid URL")).optional(),
 });
 

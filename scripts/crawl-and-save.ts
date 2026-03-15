@@ -6,6 +6,7 @@
  * Usage:  npx tsx -r tsconfig-paths/register scripts/crawl-and-save.ts
  */
 
+import "dotenv/config";
 import * as fs from "fs";
 import * as path from "path";
 import { PrismaClient } from "@prisma/client";
