@@ -293,9 +293,25 @@ export default function ContactsPage() {
             errors: [],
             message: data.message,
           });
-          // Poll every 10 seconds to refresh the contact list
-          const poll = setInterval(() => {
+          // Poll every 10 seconds to refresh contacts and crawl stats
+          const poll = setInterval(async () => {
             fetchContacts();
+            try {
+              const statusRes = await fetch("/api/contacts/import");
+              if (statusRes.ok) {
+                const status = await statusRes.json();
+                if (status.crawlStatus?.result) {
+                  setImportResult({
+                    blogsDiscovered: status.crawlStatus.result.blogsDiscovered,
+                    emailsExtracted: status.crawlStatus.result.emailsExtracted,
+                    contactsImported: status.crawlStatus.result.contactsImported,
+                    errors: status.crawlStatus.result.errors || [],
+                    message: status.crawlStatus.running ? "Crawl still running..." : "Crawl complete!",
+                  });
+                  if (!status.crawlStatus.running) clearInterval(poll);
+                }
+              }
+            } catch {}
           }, 10000);
           // Stop polling after 20 minutes
           setTimeout(() => clearInterval(poll), 20 * 60 * 1000);
