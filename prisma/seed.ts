@@ -7,6 +7,8 @@ import { radioSeedContacts } from "./seed-radio";
 import { blogJournalistSeedContacts } from "./seed-blogs-journalists";
 import { curatorPodcasterSeedContacts } from "./seed-curators-podcasters";
 import { genreFocusedSeedContacts } from "./seed-batch3-genres";
+import { batch4aSeedContacts } from "./seed-batch4a";
+import { batch4bSeedContacts } from "./seed-batch4b";
 
 const prisma = new PrismaClient();
 
@@ -1046,6 +1048,49 @@ async function main() {
   }
 
   console.log(`Upserted ${batch3Upserted} batch 3 genre-focused contacts`);
+
+  // ─── Batch 4: Genre Gap Fillers (R&B, Jazz, Americana, Classical, Latin, Folk, etc.) ──
+  const batch4Contacts = [...batch4aSeedContacts, ...batch4bSeedContacts];
+  console.log(`Seeding ${batch4Contacts.length} batch 4 genre-gap contacts (${batch4aSeedContacts.length} R&B/Jazz/Americana/Classical + ${batch4bSeedContacts.length} Latin/Folk/Country/Pop/HipHop/Metal)...`);
+
+  let batch4Upserted = 0;
+  for (const contact of batch4Contacts) {
+    try {
+      await prisma.contact.upsert({
+        where: { id: contact.id },
+        update: {
+          name: contact.name,
+          outlet: contact.outlet,
+          type: contact.type,
+          genre: contact.genre,
+          region: contact.region,
+          beat: contact.beat,
+          bio: contact.bio,
+          website: contact.website,
+          articleCount: contact.articleCount,
+        },
+        create: {
+          id: contact.id,
+          name: contact.name,
+          email: contact.email,
+          outlet: contact.outlet,
+          type: contact.type,
+          genre: contact.genre,
+          region: contact.region,
+          beat: contact.beat,
+          bio: contact.bio,
+          website: contact.website,
+          verified: contact.verified,
+          articleCount: contact.articleCount,
+        },
+      });
+      batch4Upserted++;
+    } catch (err) {
+      // skip duplicates
+    }
+  }
+
+  console.log(`Upserted ${batch4Upserted} batch 4 genre-gap contacts`);
 
   // ─── Pitch Requests ───────────────────────────────────────────────────────
 
