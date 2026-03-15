@@ -91,8 +91,8 @@ function extractEmails(html: string): string[] {
 
 // ─── Fetch with timeout and rate limiting ─────────────────────────────────────
 
-const FETCH_TIMEOUT = 12000;
-const RATE_LIMIT_MS = 800; // Polite crawling
+const FETCH_TIMEOUT = 8000;
+const RATE_LIMIT_MS = 300; // Fast crawling
 
 let lastFetchTime = 0;
 
@@ -1233,70 +1233,77 @@ export async function runCrawlPipeline(
     (await prisma.contact.findMany({ select: { email: true } })).map((c) => c.email.toLowerCase())
   );
 
-  for (let i = 0; i < allBlogs.length; i++) {
-    const blog = allBlogs[i];
-    if (!blog.url) continue;
+  // Process in batches of 5 for speed
+  const BATCH_SIZE = 5;
+  for (let i = 0; i < allBlogs.length; i += BATCH_SIZE) {
+    const batch = allBlogs.slice(i, Math.min(i + BATCH_SIZE, allBlogs.length));
+    const results = await Promise.allSettled(
+      batch.map(async (blog, batchIdx) => {
+        if (!blog.url) return;
 
-    log(`[${i + 1}/${allBlogs.length}] Crawling ${blog.name}...`);
-
-    try {
-      const { emails, bio } = await findContactEmails(blog.url);
-
-      for (const email of emails) {
-        const emailLower = email.toLowerCase();
-        if (existingEmails.has(emailLower)) continue;
-
-        const contactType = blog._contactType || (source === "journalists" ? "journalist" : source === "curators" ? "curator" : source === "podcasters" ? "podcaster" : "blog");
-        const beatMap: Record<string, string> = {
-          blog: "Music Submissions",
-          journalist: "Music Journalism",
-          curator: "Playlist Curation",
-          podcaster: "Music Podcast",
-          radio: "Radio Station",
-        };
-        const contact: DiscoveredContact = {
-          name: blog.name,
-          email,
-          outlet: blog.name,
-          url: blog.url,
-          genre: blog.genre || classifyGenre(bio + " " + (blog.description || "")),
-          region: blog.region || classifyRegion(bio + " " + (blog.description || "")),
-          type: contactType,
-          beat: beatMap[contactType] || "Music Submissions",
-          bio: (blog.description || bio || `${contactType} discovered from ${source}`).slice(0, 500),
-          source,
-        };
+        log(`[${i + batchIdx + 1}/${allBlogs.length}] Crawling ${blog.name}...`);
 
         try {
-          await prisma.contact.create({
-            data: {
-              id: `crawl-${emailLower.replace(/[@.]/g, "-")}-${Date.now()}`,
-              name: contact.name,
-              email: contact.email,
-              outlet: contact.outlet,
-              type: contact.type,
-              genre: contact.genre,
-              region: contact.region,
-              beat: contact.beat,
-              bio: contact.bio,
-              website: contact.url,
-              verified: false,
-              articleCount: 0,
-            },
-          });
-          existingEmails.add(emailLower);
-          result.contactsImported++;
-          result.contacts.push(contact);
-          result.emailsExtracted++;
-          log(`  ✓ Imported: ${email} (${blog.name})`);
+          const { emails, bio } = await findContactEmails(blog.url);
+
+          for (const email of emails) {
+            const emailLower = email.toLowerCase();
+            if (existingEmails.has(emailLower)) continue;
+
+            const contactType = blog._contactType || (source === "journalists" ? "journalist" : source === "curators" ? "curator" : source === "podcasters" ? "podcaster" : "blog");
+            const beatMap: Record<string, string> = {
+              blog: "Music Submissions",
+              journalist: "Music Journalism",
+              curator: "Playlist Curation",
+              podcaster: "Music Podcast",
+              radio: "Radio Station",
+            };
+            const contact: DiscoveredContact = {
+              name: blog.name,
+              email,
+              outlet: blog.name,
+              url: blog.url,
+              genre: blog.genre || classifyGenre(bio + " " + (blog.description || "")),
+              region: blog.region || classifyRegion(bio + " " + (blog.description || "")),
+              type: contactType,
+              beat: beatMap[contactType] || "Music Submissions",
+              bio: (blog.description || bio || `${contactType} discovered from ${source}`).slice(0, 500),
+              source,
+            };
+
+            try {
+              await prisma.contact.create({
+                data: {
+                  id: `crawl-${emailLower.replace(/[@.]/g, "-")}-${Date.now()}`,
+                  name: contact.name,
+                  email: contact.email,
+                  outlet: contact.outlet,
+                  type: contact.type,
+                  genre: contact.genre,
+                  region: contact.region,
+                  beat: contact.beat,
+                  bio: contact.bio,
+                  website: contact.url,
+                  verified: false,
+                  articleCount: 0,
+                },
+              });
+              existingEmails.add(emailLower);
+              result.contactsImported++;
+              result.contacts.push(contact);
+              result.emailsExtracted++;
+              log(`  ✓ Imported: ${email} (${blog.name})`);
+            } catch (err) {
+              if (String(err).includes("Unique constraint")) continue;
+              result.errors.push(`Import error for ${email}: ${err}`);
+            }
+          }
         } catch (err) {
-          if (String(err).includes("Unique constraint")) continue;
-          result.errors.push(`Import error for ${email}: ${err}`);
+          result.errors.push(`Error crawling ${blog.name}: ${err}`);
         }
-      }
-    } catch (err) {
-      result.errors.push(`Error crawling ${blog.name}: ${err}`);
-    }
+      })
+    );
+    log(`[${Math.min(i + BATCH_SIZE, allBlogs.length)}/${allBlogs.length}] Batch complete`);
   }
 
   log(`Imported ${result.contactsImported} new contacts from ${allBlogs.length} blogs`);
